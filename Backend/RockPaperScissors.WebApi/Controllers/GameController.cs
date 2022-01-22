@@ -1,4 +1,5 @@
 ﻿using Dawn;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RockPaperScissors.Application.Common.Interfaces;
 using RockPaperScissors.Domain.Entities;
@@ -16,6 +17,7 @@ namespace RockPaperScissors.WebApi.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [Route("api/[controller]/StartGame")]
         public async Task<ActionResult> StartGame([FromBody] int scoreLimit)
         {
@@ -32,6 +34,7 @@ namespace RockPaperScissors.WebApi.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [Route("api/[controller]/JoinGame/{gameId}")]
         public async Task<ActionResult> JoinGame([FromRoute] string gameId)
         {
@@ -48,6 +51,7 @@ namespace RockPaperScissors.WebApi.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [Route("api/[controller]/MakeMove/{gameId}")]
         public async Task<ActionResult> MakeMove([FromRoute] string gameId, [FromBody] GameFigure gameFigure)
         {
@@ -64,6 +68,7 @@ namespace RockPaperScissors.WebApi.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [Route("api/[controller]/StopGame/{gameId}")]
         public async Task<ActionResult> StopGame([FromRoute] string gameId)
         {
@@ -72,6 +77,23 @@ namespace RockPaperScissors.WebApi.Controllers
                 await _gameService.StopGame(new Guid(gameId));
 
                 return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Authorize]
+        [Route("api/[controller]/GetMyGames")]
+        public async Task<ActionResult> GetMyGames()
+        {
+            try
+            {
+                var games = await _gameService.GetMyGames();
+
+                return Ok(games);
             }
             catch (Exception ex)
             {
