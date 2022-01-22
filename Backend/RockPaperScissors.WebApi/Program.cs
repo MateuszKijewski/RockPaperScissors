@@ -21,6 +21,7 @@ JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
 
 services.AddControllers();
+services.AddSignalR();
 services.AddCors();
 services.AddMvc();
 
@@ -89,11 +90,12 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "My service");
     c.RoutePrefix = string.Empty;
 });
-app.UseCors(options => options.WithOrigins(ConfigurationHelper.GetAllowedOrigins(builder.Configuration)).AllowAnyMethod().AllowAnyHeader());
+app.UseCors(options => options.WithOrigins(ConfigurationHelper.GetAllowedOrigins(builder.Configuration)).AllowAnyMethod().AllowAnyHeader().AllowCredentials());
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseRouting();
 app.UseAuthorization();
+app.ConfigureSignalR();
 app.MapControllers();
 
 app.Run();
