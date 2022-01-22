@@ -135,5 +135,16 @@ namespace RockPaperScissors.Application.Games.Services
 
             await _gameHub.Clients.Group(gameId.ToString()).SendAsync("ReceiveGameUpdate", game);
         }
+
+        public async Task<IEnumerable<Game>> GetMyGames()
+        {
+            var gameRepository = _baseRepositoryProvider.GetRepository<Game>();
+
+            var userId = _currentUserService.Id;
+
+            var games = await gameRepository.FindAsync(x => x.HostId == userId || x.GuestId == userId);
+
+            return games;
+        }
     }
 }

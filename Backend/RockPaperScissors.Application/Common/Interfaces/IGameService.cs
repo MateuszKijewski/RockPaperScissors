@@ -11,5 +11,7 @@ namespace RockPaperScissors.Application.Common.Interfaces
         public Task MakeMove(Guid gameId, GameFigure figure);
 
         public Task StopGame(Guid gameId);
+
+        public Task<IEnumerable<Game>> GetMyGames();
     }
 }
