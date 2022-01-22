@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using RockPaperScissors.Application.Auth.Providers;
 using RockPaperScissors.Application.Auth.Services;
 using RockPaperScissors.Application.Common.Interfaces;
+using RockPaperScissors.Application.Games.Services;
 using RockPaperScissors.Application.Sercurity.Services;
 
 namespace RockPaperScissors.Application
@@ -15,6 +16,7 @@ namespace RockPaperScissors.Application
             services.AddScoped<IHashingService, HashingService>();
             services.AddScoped<ITokenProvider, TokenProvider>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IGameService, GameService>();
 
             return services;
         }

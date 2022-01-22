@@ -1,4 +1,6 @@
-﻿namespace RockPaperScissors.WebApi.Helpers
+﻿using RockPaperScissors.Application.Games.Hubs;
+
+namespace RockPaperScissors.WebApi.Helpers
 {
     public static class ConfigurationHelper
     {
@@ -10,8 +12,7 @@
 
         public static void ConfigureSignalR(this WebApplication webApplication)
         {
-            //webApplication.UseEndpoints(routes => routes.MapHub<NotificationHub>("/ws/notifications"));
-            //webApplication.UseEndpoints(routes => routes.MapHub<OrderHub>("/ws/orders"));
+            webApplication.UseEndpoints(routes => routes.MapHub<GameHub>("/ws/game"));
         }
     }
 }
