@@ -1,62 +1,83 @@
 <template>
     <div class="flex h-screen dark:bg-dark">
-        <div class="m-auto">
-            <div
-                class="p-16 shadow-xl rounded-xl text-center bg-white dark:bg-dark dark:text-light text-dark"
-            >
-                <h1 class="text-3xl font-bold text-orange-500">Welcome</h1>
-                <p>Select your name:</p>
-                <div class="text-left p-4">
-                    <input
-                        v-model="user"
-                        type="email"
-                        placeholder="name"
-                        class="px-6 py-2 rounded-lg dark:bg-dark border-2 dark:border-light shadow-md focus:outline-none focus:border-2"
-                        :class="failed ? 'dark:border-cred' : null"
-                    />
-                </div>
-                <button
-                    @click="logIn"
-                    type="button"
-                    class="bg-gradient-to-r from-cred to-[#FF1E38] py-3 pr-8 pl-8 dark:text-light font-semibold rounded-xl focus:ring-2 m-4"
+        <div class="m-auto w-3/4 text-center lg:w-1/2">
+            <div class="w-100 p-6 bg-slate-300">
+                <div
+                    class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in"
                 >
-                    Start!
-                </button>
+                    <input
+                        type="checkbox"
+                        name="toggle"
+                        id="toggle"
+                        v-model="isRegister"
+                        class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-dark border-4 appearance-none cursor-pointer"
+                    />
+                    <label
+                        for="toggle"
+                        class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-800 cursor-pointer"
+                    ></label>
+                </div>
+                <label for="toggle" class="text-gray-700">{{
+                    isRegister ? 'login' : 'register'
+                }}</label>
             </div>
+            <Register v-if="isRegister" />
+            <Login v-else />
         </div>
     </div>
 </template>
 
 <script>
-import { onBeforeMount, ref } from 'vue';
-import { useUser } from '@/state/useUser';
-import { useStorage } from '@vueuse/core';
 import { useRouter } from 'vue-router';
+import useVuelidate from '@vuelidate/core';
+import { required, email } from '@vuelidate/validators';
+import { reactive, ref } from 'vue';
+import { useApi } from '@/composables/useApi';
+import Register from '@/components/Register.vue';
+import Login from '@/components/Login.vue';
+
 export default {
     name: 'welcome',
+    components: { Register, Login },
     setup() {
-        const user = ref('');
-        const router = useRouter();
-        onBeforeMount(() => {
-            useStorage('rps-app', user);
+        const user = reactive({
+            email: '',
+            password: '',
         });
-        const userAuth = useUser();
+        const isRegister = ref(false);
+        const router = useRouter();
+        const { post, data } = useApi('Auth/Login');
+        const rules = {
+            email: { required, email },
+            password: { required },
+        };
         const failed = ref(false);
         const logIn = () => {
             failed.value = false;
-            console.log(user.value);
-            if (user.value === '') {
-                failed.value = true;
-                return;
+
+            console.log(v$.$invalid);
+
+            if (!v$.$invalid) {
+                post(user).then(() => {
+                    console.log(data);
+                });
             }
-            router.push({
-                name: 'listGames',
-            });
-            // userAuth.setUser(user.value);
         };
-        return { user, logIn, failed };
+        const v$ = useVuelidate(rules, user);
+
+        return { isRegister, user, logIn, failed, v$ };
     },
 };
 </script>
 
-<style></style>
+<style>
+.toggle-checkbox:checked {
+    @apply: right-0 border-green-400;
+    right: 0;
+    border-color: #68d391;
+}
+.toggle-checkbox:checked + .toggle-label {
+    @apply: bg-green-400;
+    background-color: #68d391;
+}
+</style>

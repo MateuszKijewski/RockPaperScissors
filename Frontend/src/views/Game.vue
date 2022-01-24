@@ -10,15 +10,20 @@
             </h1>
             <div>
                 <div
+                    v-if="currentGame"
                     class="grid grid-cols-2 dark:bg-dark mb-6 border-2 p-6 shadow-lg shadow-black rounded-md"
                 >
                     <div class="flex flex-col items-center">
                         <p class="text-lg font-semibold">Your score:</p>
-                        <p class="text-5xl font-semibold">0</p>
+                        <p class="text-5xl font-semibold">
+                            {{ currentGame.hostScore }}
+                        </p>
                     </div>
                     <div class="flex flex-col items-center">
                         <p class="text-lg font-semibold">{#oponent} Score:</p>
-                        <p class="text-5xl font-semibold">1</p>
+                        <p class="text-5xl font-semibold">
+                            {{ currentGame.guestScore }}
+                        </p>
                     </div>
                 </div>
                 <div
@@ -28,7 +33,7 @@
                         <div
                             class="w-44 p-4 m-auto"
                             :class="
-                                type == 'rock'
+                                type == 'Rock'
                                     ? 'border-2 rounded-xl border-light '
                                     : null
                             "
@@ -77,7 +82,7 @@
                         <input
                             type="radio"
                             id="rock"
-                            value="rock"
+                            value="Rock"
                             v-model="type"
                             class="opacity-0 h-0 w-0"
                         />
@@ -89,7 +94,7 @@
                         <div
                             class="w-44 p-4 m-auto"
                             :class="
-                                type == 'paper'
+                                type == 'Paper'
                                     ? 'border-2 rounded-xl border-light '
                                     : null
                             "
@@ -154,19 +159,19 @@
                         <input
                             type="radio"
                             id="paper"
-                            value="paper"
+                            value="Paper"
                             v-model="type"
                             class="opacity-0 h-0 w-0"
                         />
                     </label>
                     <label
-                        for="scissor"
+                        for="Scissor"
                         class="flex flex-col items-center h-full"
                     >
                         <div
                             class="w-44 p-4 m-auto"
                             :class="
-                                type == 'scissor'
+                                type == 'Scissors'
                                     ? 'border-2 rounded-xl border-light '
                                     : null
                             "
@@ -218,8 +223,8 @@
                         </div>
                         <input
                             type="radio"
-                            id="scissor"
-                            value="scissor"
+                            id="Scissor"
+                            value="Scissors"
                             v-model="type"
                             class="opacity-0 h-0 w-0"
                         />
@@ -233,40 +238,106 @@
 
 <script>
 import ModalApp from '@/components/ModalApp.vue';
-import { useRoute } from 'vue-router';
-import { computed, ref, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import {
+    computed,
+    ref,
+    watch,
+    onMounted,
+    onBeforeMount,
+    inject,
+    reactive,
+    toRefs,
+} from 'vue';
 import GameHistory from '../components/GameHistory.vue';
+import { HttpTransportType } from '@microsoft/signalr';
+import { useApi } from '@/composables/useApi';
+import { VueSignalR } from '@/modules/signalR/index';
+import app from '@/main.js';
+import { useGame } from '@/state/useGame';
 export default {
     components: { ModalApp, GameHistory },
     name: 'game',
     setup() {
         const route = useRoute();
-        const type = ref('');
-
-        const isFullLobby = ref(false);
-        const showModal = ref(true);
+        const router = useRouter();
         const id = computed(() => route.params.id);
+        const JoinGameApi = useApi('Game/JoinGame/' + id.value);
+        const MakeMoveApi = useApi('Game/MakeMove/' + id.value);
+        app.use(VueSignalR, {
+            url: 'https://localhost:7182/',
+            options: {},
+            provider: 'game?token=' + id.value,
+            withUrlOptions: {
+                skipNegotiation: true,
+                transport: HttpTransportType.WebSockets,
+                withCredentials: false,
+            },
+        });
+        const gameStore = useGame();
+        const { currentGame } = toRefs(gameStore);
+        const WsGame = inject('signalRGame');
+        const type = ref('');
+        const isJoin = computed(() => route.query.type === 'join');
+        const game = ref(currentGame);
 
-        const isSelected = computed(() =>
-            ['paper', 'rock', 'scissor'].includes(type.value)
-        );
+        onBeforeMount(() => {
+            gameStore.setCurrentGameId(id.value);
+        });
+        if (isJoin.value) {
+            console.log('joinGame');
+            JoinGameApi.post()
+                .then(() => {
+                    game.value = JoinGameApi.data.value;
+                })
+                .catch((e) => {
+                    router.push({ name: 'listGames' });
+                });
+        }
+        onMounted(() => {});
+        WsGame.on('ReceiveGameUpdate', (data) => {
+            gameStore.setCurrentGame(data);
+            console.log(data);
+        });
+        const isFullLobby = computed(() => {
+            return !game.value.guestId === null;
+        });
+        const yourTurn = computed(() => {
+            if (currentGame) {
+                return currentGame;
+            }
+        });
+        const showModal = ref(false);
+
+        // const isSelected = computed(() =>
+        //     ['Paper', 'Rock', 'Scissors'].includes(type.value)
+        // );
         const checkShowModal = () => {
             if (!isFullLobby.value) showModal.value = true;
             if (isSelected.value) showModal.value = true;
             return false;
         };
+        watch(type, () => {
+            console.log(type.value);
+            const enums = ['Rock', 'Paper', 'Scissors'];
+            MakeMoveApi.post(enums.indexOf(type.value)).then(() => {
+                game.value = MakeMoveApi.data.value;
+                console.log(MakeMoveApi.data.value);
+            });
+        });
         const ModalValue = computed(() => {
-            if (!isFullLobby.value) return 'Game start when oponent will join.';
-            if (isSelected.value) return 'Wait for oponent choose';
+            // if (!isFullLobby.value) return 'Game start when oponent will join.';
+            // if (isSelected.value) return 'Wait for oponent choose';
             return '';
         });
         return {
             id,
             type,
-            isSelected,
             isFullLobby,
             showModal,
             ModalValue,
+            game,
+            currentGame,
         };
     },
 };
