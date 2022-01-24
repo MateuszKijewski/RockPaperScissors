@@ -69,7 +69,11 @@ namespace RockPaperScissors.Application.Games.Services
             using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
                 var gameRepository = _baseRepositoryProvider.GetRepository<Game>();
+                var userRepository = _baseRepositoryProvider.GetRepository<User>();
+
                 game = await gameRepository.GetAsync(gameId);
+                game.Host = await userRepository.GetAsync(game.HostId.Value);
+                game.Guest = await userRepository.GetAsync(game.GuestId.Value);
 
                 if (!game.IsActive)
                 {
@@ -100,6 +104,8 @@ namespace RockPaperScissors.Application.Games.Services
                         else
                             game.GuestScore++;
                     }
+                    game.HostTurnFinished = false;
+                    game.GuestTurnFinished = false;
                 }
 
                 if (game.HostScore == game.ScoreLimit)
