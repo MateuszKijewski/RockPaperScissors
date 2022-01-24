@@ -6,7 +6,7 @@ namespace RockPaperScissors.Application.Common.Interfaces
     {
         Task<UserDto> RegisterNewUser(RegisterDto userDto);
 
-        Task<JwtToken> HandleLogin(LoginDto loginDto);
+        Task<SecurityToken> HandleLogin(LoginDto loginDto);
 
         UserDto GetCurrentUser();
     }

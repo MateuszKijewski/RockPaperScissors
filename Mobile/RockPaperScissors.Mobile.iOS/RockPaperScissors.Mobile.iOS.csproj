@@ -126,11 +126,11 @@
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2196" />
     <PackageReference Include="Xamarin.Essentials" Version="1.7.0" />
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ItemGroup>
     <ProjectReference Include="..\RockPaperScissors.Mobile\RockPaperScissors.Mobile.csproj">
-      <Project>{C591E44C-B680-46A3-890C-2E38DAF71029}</Project>
+      <Project>{8d3a2984-631f-45ce-aa57-712e89a3b002}</Project>
       <Name>RockPaperScissors.Mobile</Name>
     </ProjectReference>
   </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

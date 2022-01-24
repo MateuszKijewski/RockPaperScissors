@@ -90,7 +90,7 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "My service");
     c.RoutePrefix = string.Empty;
 });
-app.UseCors(options => options.WithOrigins(ConfigurationHelper.GetAllowedOrigins(builder.Configuration)).AllowAnyMethod().AllowAnyHeader().AllowCredentials());
+app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseRouting();

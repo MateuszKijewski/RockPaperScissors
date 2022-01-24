@@ -1,6 +1,6 @@
-﻿using System;
+﻿using RockPaperScissors.Mobile.Common.Interfaces;
+using RockPaperScissors.Mobile.Services;
 using Xamarin.Forms;
-using Xamarin.Forms.Xaml;
 
 namespace RockPaperScissors.Mobile
 {
@@ -10,7 +10,11 @@ namespace RockPaperScissors.Mobile
         {
             InitializeComponent();
 
-            MainPage = new MainPage();
+            DependencyService.RegisterSingleton<ISettingsService>(new SettingsService());
+            DependencyService.Register<IAuthService, AuthService>();
+            DependencyService.Register<IGameService, GameService>();
+
+            MainPage = new AppShell();
         }
 
         protected override void OnStart()
