@@ -1,6 +1,9 @@
 ﻿using MvvmHelpers;
 using MvvmHelpers.Commands;
+using RockPaperScissors.Mobile.Common.Interfaces;
+using RockPaperScissors.Mobile.Views;
 using System.Threading.Tasks;
+using Xamarin.Forms;
 
 namespace RockPaperScissors.Mobile.ViewModels
 {
@@ -10,12 +13,12 @@ namespace RockPaperScissors.Mobile.ViewModels
         {
             JoinGameCommand = new AsyncCommand(JoinGame);
             NewGameCommand = new AsyncCommand(NewGame);
-            GameHistoryCommand = new AsyncCommand(GameHistory);
+            ShowGameHistoryCommand = new AsyncCommand(ShowGameHistory);
         }
 
         public AsyncCommand JoinGameCommand { get; set; }
         public AsyncCommand NewGameCommand { get; set; }
-        public AsyncCommand GameHistoryCommand { get; set; }
+        public AsyncCommand ShowGameHistoryCommand { get; set; }
 
         private async Task JoinGame()
         {
@@ -26,9 +29,9 @@ namespace RockPaperScissors.Mobile.ViewModels
         {
 
         }
-        private async Task GameHistory()
+        private async Task ShowGameHistory()
         {
-
+            await Shell.Current.GoToAsync($"//{nameof(GameHistoryPage)}");
         }
 
         private string _scoreLimit;

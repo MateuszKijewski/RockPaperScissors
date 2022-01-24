@@ -15,6 +15,6 @@ namespace RockPaperScissors.Mobile.Views
         public MainMenuPage()
         {
             InitializeComponent();
-        }
+        }        
     }
 }

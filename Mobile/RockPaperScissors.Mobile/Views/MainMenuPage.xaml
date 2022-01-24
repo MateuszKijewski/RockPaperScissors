@@ -11,7 +11,7 @@
             <StackLayout Grid.Row="2">
                 <Entry Placeholder="Score limit"  Text="{Binding ScoreLimit}"></Entry>
                 <Button Text="START NEW GAME" Command="{Binding NewGameCommand}"></Button>
-                <Button Text="GAME HISTORY" Command="{Binding GameHistoryCommand}"></Button>
+                <Button Text="GAME HISTORY" Command="{Binding ShowGameHistoryCommand}"></Button>
             </StackLayout>
             <StackLayout Grid.Row="3">
                 <Entry Placeholder="Token" Text="{Binding GameId}"></Entry>

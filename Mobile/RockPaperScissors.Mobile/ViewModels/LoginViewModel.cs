@@ -20,12 +20,12 @@ namespace RockPaperScissors.Mobile.ViewModels
             SwitchToRegisterCommand = new Command(SwitchToRegister);
         }
 
-        private async void SwitchToRegister(object obj)
+        private async void SwitchToRegister()
         {
             await Shell.Current.GoToAsync($"//{nameof(RegisterPage)}");
         }
 
-        private async void Login(object obj)
+        private async void Login()
         {
             if (string.IsNullOrEmpty(UserName)
                 || string.IsNullOrEmpty(Password))
