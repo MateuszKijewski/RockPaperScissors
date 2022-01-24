@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RockPaperScissors.Mobile.Views.MainMenuPage"
+             xmlns:vm="clr-namespace:RockPaperScissors.Mobile.ViewModels">
+    <ContentPage.BindingContext>
+        <vm:MainMenuViewModel/>
+    </ContentPage.BindingContext>
+    <ContentPage.Content>
+        <Grid RowDefinitions="Auto,*">
+            <StackLayout Grid.Row="2">
+                <Entry Placeholder="Score limit"  Text="{Binding ScoreLimit}"></Entry>
+                <Button Text="START NEW GAME" Command="{Binding NewGameCommand}"></Button>
+                <Button Text="GAME HISTORY" Command="{Binding ShowGameHistoryCommand}"></Button>
+            </StackLayout>
+            <StackLayout Grid.Row="3">
+                <Entry Placeholder="Token" Text="{Binding GameId}"></Entry>
+                <Button Text="JOIN GAME" Command="{Binding JoinGameCommand}"></Button>
+            </StackLayout>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

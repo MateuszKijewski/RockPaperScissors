@@ -46,9 +46,17 @@ namespace RockPaperScissors.Persistence.Common
             return await dbSet.ToListAsync();
         }
 
-        public async Task<TEntity> GetAsync(Guid id)
+        public async Task<TEntity> GetAsync(Guid id, params string[] expandProperties)
         {
-            var entity = await _dbContext.Set<TEntity>().FindAsync(id);
+            var dbSet = _dbContext.Set<TEntity>();
+
+            foreach (var expandProperty in expandProperties)
+            {
+                dbSet.Include(expandProperty).ToList();
+            }
+
+            var entity = await dbSet.FindAsync(id);
+
             if (entity == null)
                 throw new Exception($"Entity with {id} doesnt exist");
 

@@ -31,7 +31,7 @@ namespace RockPaperScissors.Application.Auth.Services
             };
         }
 
-        public async Task<JwtToken> HandleLogin(LoginDto loginDto)
+        public async Task<SecurityToken> HandleLogin(LoginDto loginDto)
         {
             var userRepository = _baseRepositoryProvider.GetRepository<User>();
 

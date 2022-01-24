@@ -5,7 +5,7 @@ namespace RockPaperScissors.Application.Common.Interfaces
     public interface IBaseRepository<TEntity>
         where TEntity : class
     {
-        Task<TEntity> GetAsync(Guid id);
+        Task<TEntity> GetAsync(Guid id, params string[] expandProperties);
 
         Task<IEnumerable<TEntity>> GetAsync(Guid[] ids);
 
