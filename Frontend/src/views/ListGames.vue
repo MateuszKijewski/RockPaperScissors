@@ -92,7 +92,7 @@ export default {
         };
         const CreateNewGame = () => {
             startGame.post(5).then((e) => {
-                gameStore.setCurrentGame(e);
+                gameStore.setCurrentGame(startGame.data.value);
                 router.push({
                     name: 'Game',
                     params: { id: startGame.data.value.id },

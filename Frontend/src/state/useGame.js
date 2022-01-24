@@ -9,7 +9,7 @@ export const useGame = defineStore({
     state: () => ({
         games: [],
         currentGameId: '',
-        currentGame: null,
+        currentGame: { guestId: null },
         loading: false,
         toResults: 5,
     }),

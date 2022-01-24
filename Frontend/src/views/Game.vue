@@ -14,13 +14,23 @@
                     class="grid grid-cols-2 dark:bg-dark mb-6 border-2 p-6 shadow-lg shadow-black rounded-md"
                 >
                     <div class="flex flex-col items-center">
-                        <p class="text-lg font-semibold">Your score:</p>
+                        <p
+                            v-if="currentGame.host"
+                            class="text-lg font-semibold"
+                        >
+                            HOST {{ currentGame.host.firstName }} score:
+                        </p>
                         <p class="text-5xl font-semibold">
                             {{ currentGame.hostScore }}
                         </p>
                     </div>
                     <div class="flex flex-col items-center">
-                        <p class="text-lg font-semibold">{#oponent} Score:</p>
+                        <p
+                            v-if="currentGame.guest"
+                            class="text-lg font-semibold"
+                        >
+                            {{ currentGame.guest.firstName }} Score:
+                        </p>
                         <p class="text-5xl font-semibold">
                             {{ currentGame.guestScore }}
                         </p>
@@ -255,15 +265,21 @@ import { useApi } from '@/composables/useApi';
 import { VueSignalR } from '@/modules/signalR/index';
 import app from '@/main.js';
 import { useGame } from '@/state/useGame';
+import { useAuth } from '@/state/useAuth';
 export default {
     components: { ModalApp, GameHistory },
     name: 'game',
     setup() {
         const route = useRoute();
         const router = useRouter();
-        const id = computed(() => route.params.id);
+        const gameStore = useGame();
+        const { user } = toRefs(useAuth());
+        const { currentGame } = toRefs(gameStore);
+        const id = computed(() => currentGame.value.id || route.params.id);
         const JoinGameApi = useApi('Game/JoinGame/' + id.value);
         const MakeMoveApi = useApi('Game/MakeMove/' + id.value);
+        const showModal = ref(true);
+
         app.use(VueSignalR, {
             url: 'https://localhost:7182/',
             options: {},
@@ -274,13 +290,13 @@ export default {
                 withCredentials: false,
             },
         });
-        const gameStore = useGame();
-        const { currentGame } = toRefs(gameStore);
+
         const WsGame = inject('signalRGame');
         const type = ref('');
         const isJoin = computed(() => route.query.type === 'join');
-        const game = ref(currentGame);
-
+        const isHost = computed(
+            () => user.value.id === currentGame.value.hostId
+        );
         onBeforeMount(() => {
             gameStore.setCurrentGameId(id.value);
         });
@@ -288,7 +304,8 @@ export default {
             console.log('joinGame');
             JoinGameApi.post()
                 .then(() => {
-                    game.value = JoinGameApi.data.value;
+                    gameStore.setCurrentGame(JoinGameApi.data.value);
+                    checkShowModal();
                 })
                 .catch((e) => {
                     router.push({ name: 'listGames' });
@@ -296,38 +313,50 @@ export default {
         }
         onMounted(() => {});
         WsGame.on('ReceiveGameUpdate', (data) => {
-            gameStore.setCurrentGame(data);
             console.log(data);
+            gameStore.setCurrentGame(data);
+            checkShowModal();
         });
         const isFullLobby = computed(() => {
-            return !game.value.guestId === null;
+            return currentGame.value.guestId !== null;
         });
         const yourTurn = computed(() => {
-            if (currentGame) {
-                return currentGame;
-            }
+            return currentGame.value.guestId;
         });
-        const showModal = ref(false);
-
-        // const isSelected = computed(() =>
-        //     ['Paper', 'Rock', 'Scissors'].includes(type.value)
-        // );
+        const isSelected = computed(() => {
+            if (isHost.value) return currentGame.value.hostTurnFinished;
+            else return currentGame.value.guestTurnFinished;
+        });
         const checkShowModal = () => {
+            console.log('check show modal');
             if (!isFullLobby.value) showModal.value = true;
-            if (isSelected.value) showModal.value = true;
-            return false;
+            else if (isFullLobby.value) showModal.value = false;
+            else if (isSelected.value) showModal.value = true;
+            else if (!isSelected.value) showModal.value = false;
+            else return false;
         };
         watch(type, () => {
             console.log(type.value);
             const enums = ['Rock', 'Paper', 'Scissors'];
-            MakeMoveApi.post(enums.indexOf(type.value)).then(() => {
-                game.value = MakeMoveApi.data.value;
-                console.log(MakeMoveApi.data.value);
-            });
+
+            if (type.value !== '') {
+                MakeMoveApi.post(enums.indexOf(type.value)).then(() => {
+                    console.log(MakeMoveApi.data.value);
+                    type.value = '';
+                });
+            }
+        });
+        const nextTurn = computed(() => {
+            return (
+                currentGame.value.hostTurnFinished &&
+                currentGame.value.guestTurnFinished
+            );
         });
         const ModalValue = computed(() => {
-            // if (!isFullLobby.value) return 'Game start when oponent will join.';
-            // if (isSelected.value) return 'Wait for oponent choose';
+            if (!isFullLobby.value) return 'Game start when oponent will join.';
+            if (isSelected.value) return 'Wait for oponent choose';
+            // if (!currentGame.value.isActive)
+            //     return `End game! result: host ${currentGame.value.host}`;
             return '';
         });
         return {
@@ -336,8 +365,12 @@ export default {
             isFullLobby,
             showModal,
             ModalValue,
-            game,
             currentGame,
+            yourTurn,
+            nextTurn,
+            isHost,
+            user,
+            isSelected,
         };
     },
 };
