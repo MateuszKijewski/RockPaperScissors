@@ -71,9 +71,7 @@ namespace RockPaperScissors.Application.Games.Services
                 var gameRepository = _baseRepositoryProvider.GetRepository<Game>();
                 var userRepository = _baseRepositoryProvider.GetRepository<User>();
 
-                game = await gameRepository.GetAsync(gameId);
-                game.Host = await userRepository.GetAsync(game.HostId.Value);
-                game.Guest = await userRepository.GetAsync(game.GuestId.Value);
+                game = await gameRepository.GetAsync(gameId, nameof(Game.Guest), nameof(Game.Host));
 
                 if (!game.IsActive)
                 {
@@ -148,7 +146,7 @@ namespace RockPaperScissors.Application.Games.Services
 
             var userId = _currentUserService.Id;
 
-            var games = await gameRepository.FindAsync(x => x.HostId == userId || x.GuestId == userId);
+            var games = await gameRepository.FindAsync(x => x.HostId == userId || x.GuestId == userId, nameof(Game.Guest), nameof(Game.Host));
 
             return games;
         }

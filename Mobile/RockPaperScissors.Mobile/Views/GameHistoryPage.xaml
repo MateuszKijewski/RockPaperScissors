@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RockPaperScissors.Mobile.Views.GameHistoryPage"
+             xmlns:vm="clr-namespace:RockPaperScissors.Mobile.ViewModels">
+    <ContentPage.BindingContext>
+        <vm:GameHistoryViewModel/>
+    </ContentPage.BindingContext>
+    <ContentPage.Content>
+        <ListView>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextCell Text="{Binding Title}"
+                              Detail="{Binding Subtitle}" />
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </ContentPage.Content>
+</ContentPage>

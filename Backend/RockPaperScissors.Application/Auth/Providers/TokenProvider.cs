@@ -28,17 +28,14 @@ namespace RockPaperScissors.Application.Auth.Providers
             _tokenValidationOptions = Guard.Argument(tokenValidationOptions.Value, nameof(tokenValidationOptions.Value)).NotNull().Value;
         }
 
-        public async Task<JwtToken> GetTokenAsync(User user)
+        public async Task<Common.Interfaces.SecurityToken> GetTokenAsync(User user)
         {
             var authToken = await CreateSecurityToken(user);
 
-            return new JwtToken
+            return new Common.Interfaces.SecurityToken
             {
-                AuthToken = new Common.Interfaces.SecurityToken
-                {
-                    Token = new JwtSecurityTokenHandler().WriteToken(authToken),
-                    ExpiryDate = authToken.ValidTo,
-                }
+                Token = new JwtSecurityTokenHandler().WriteToken(authToken),
+                ExpiryDate = authToken.ValidTo,
             };
         }
 

@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:viewmodels="clr-namespace:RockPaperScissors.Mobile.ViewModels"
+             x:Class="RockPaperScissors.Mobile.Views.RegisterPage">
+    <ContentPage.BindingContext>
+        <viewmodels:RegisterViewModel/>
+    </ContentPage.BindingContext>
+    <ContentPage.Content>
+        <Grid RowDefinitions="Auto, *">
+            <Label Text="Registration" FontSize="36"
+               Margin="0, 40, 0, 0"
+               HorizontalOptions="Center"/>
+            <StackLayout Grid.Row="1" VerticalOptions="Center">
+                <StackLayout Padding="40, 0, 40, 40" Spacing="10">
+                    <Frame CornerRadius="10"
+                           WidthRequest="360"
+                           HeightRequest="64"
+                           Padding="0">
+                        <Entry Text="{Binding UserName}" Placeholder="UserName"
+                               VerticalOptions="Center"
+                               HeightRequest="64" WidthRequest="360" 
+                               HorizontalOptions="StartAndExpand"/>
+                    </Frame>
+                    <Frame CornerRadius="10"
+                           WidthRequest="360"
+                           HeightRequest="64"
+                           Padding="0">
+                        <Entry Text="{Binding Password}" 
+                               VerticalOptions="Center" Placeholder="Password" IsPassword="true"
+                               HeightRequest="64" WidthRequest="360"
+                               HorizontalOptions="StartAndExpand"/>
+                    </Frame>
+                    <Frame CornerRadius="10"
+                           WidthRequest="360"
+                           HeightRequest="64"
+                           Padding="0">
+                        <Entry Text="{Binding ConfirmPassword}" Placeholder="Confirm Password" IsPassword="true"
+                                   VerticalOptions="Center"
+                                   HeightRequest="64" WidthRequest="360"
+                                   HorizontalOptions="StartAndExpand"/>
+                    </Frame>
+                    <Frame CornerRadius="10"
+                           WidthRequest="360"
+                           HeightRequest="64"
+                           Padding="0">
+                        <Entry Text="{Binding FirstName}" 
+                               VerticalOptions="Center" Placeholder="First name"
+                               HeightRequest="64" WidthRequest="360"
+                               HorizontalOptions="StartAndExpand"/>
+                    </Frame>
+                    <Frame CornerRadius="10"
+                           WidthRequest="360"
+                           HeightRequest="64"
+                           Padding="0">
+                        <Entry Text="{Binding LastName}" 
+                               VerticalOptions="Center" Placeholder="Last name"
+                               HeightRequest="64" WidthRequest="360"
+                               HorizontalOptions="StartAndExpand"/>
+                    </Frame>
+                </StackLayout>
+                <StackLayout Padding="40, 0, 40, 50">
+                    <Button Command="{Binding RegisterCommand}" Text="Register" HeightRequest="64" 
+                                WidthRequest="360" CornerRadius="10"/>
+                    <Button Command="{Binding SwitchToLoginCommand}" Text="I have an account" HeightRequest="64" 
+                                WidthRequest="360" CornerRadius="10"/>
+                </StackLayout>
+            </StackLayout>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>
