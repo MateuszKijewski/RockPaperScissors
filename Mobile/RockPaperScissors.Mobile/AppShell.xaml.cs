@@ -16,6 +16,7 @@ namespace RockPaperScissors.Mobile
             Routing.RegisterRoute(nameof(LoginPage), typeof(LoginPage));
             Routing.RegisterRoute(nameof(RegisterPage), typeof(RegisterPage));
             Routing.RegisterRoute(nameof(MainMenuPage), typeof(MainMenuPage));
+            Routing.RegisterRoute(nameof(GameHistoryPage), typeof(GameHistoryPage));
         }
 
         private async void OnMenuItemClicked(object sender, EventArgs e)

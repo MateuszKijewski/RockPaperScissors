@@ -7,7 +7,7 @@
         <vm:GameHistoryViewModel/>
     </ContentPage.BindingContext>
     <ContentPage.Content>
-        <ListView>
+        <ListView ItemsSource="{Binding MyGames}">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <TextCell Text="{Binding Title}"

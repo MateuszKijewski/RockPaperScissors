@@ -8,15 +8,18 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Xamarin.Forms;
 
 namespace RockPaperScissors.Mobile.Services
 {
     public class GameService : IGameService
     {
         private readonly JsonSerializerSettings _serializerSettings;
+        private readonly ISettingsService _settingsService;
 
         public GameService()
         {
+            _settingsService = DependencyService.Get<ISettingsService>();
             _serializerSettings = new JsonSerializerSettings
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver(),
@@ -28,6 +31,9 @@ namespace RockPaperScissors.Mobile.Services
         public async Task<IEnumerable<Game>> GetMyGames()
         {
             var client = CreateHttpClient();
+            
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _settingsService.AccessToken);
+
 
             var response = await client.GetAsync($"{GlobalSettings.Instance.DefaultGameEndpoint}/GetMyGames");
 
