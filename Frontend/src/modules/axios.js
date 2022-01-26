@@ -2,7 +2,7 @@ import useToken from '@/composables/useToken';
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'https://localhost:7182/api/',
+    baseURL: 'http://rockpaperscissorscdv.azurewebsites.net/api/',
     headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',

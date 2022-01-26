@@ -19,7 +19,7 @@ export const useAuth = defineStore({
     actions: {
         setUser(data) {
             this.$patch((state) => {
-                setToken(data.authToken.token);
+                setToken(data.token);
                 state.refreshToken = data.refreshToken;
                 state.isLogged = true;
             });

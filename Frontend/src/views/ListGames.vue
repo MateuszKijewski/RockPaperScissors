@@ -46,6 +46,12 @@
                 </button>
             </div>
         </div>
+
+        <div
+            class="dark:bg-darken bg-white w-full md:max-w-4xl rounded-lg shadow-xl mt-12"
+        >
+            <GameHistory />
+        </div>
     </div>
 </template>
 
@@ -56,11 +62,12 @@ import { useAuth } from '@/state/useAuth';
 import { useApi } from '@/composables/useApi';
 import { useGame } from '@/state/useGame';
 import { useRouter } from 'vue-router';
+import GameHistory from '@/components/GameHistory.vue';
 
 export default {
     name: 'Games',
 
-    components: { ListGameItem },
+    components: { ListGameItem, GameHistory },
     setup() {
         const router = useRouter();
         const authStore = useAuth();

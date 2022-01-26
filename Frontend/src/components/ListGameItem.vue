@@ -22,7 +22,6 @@
 
 <script>
 import FightIcon from '@/assets/icons/fight.svg';
-
 export default {
     name: 'ListGameItem',
     props: {

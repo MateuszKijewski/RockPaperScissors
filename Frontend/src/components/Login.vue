@@ -26,6 +26,7 @@
                 :class="failed ? 'dark:border-cred' : null"
             />
         </div>
+        <div class="text-cred" v-if="error">User or Password is incorrect</div>
         <button
             @click="logIn"
             type="button"
@@ -52,7 +53,7 @@ export default {
         });
         const router = useRouter();
         const authStore = useAuth();
-        const { post, data } = useApi('Auth/Login');
+        const { post, data, error } = useApi('Auth/Login');
         const rules = {
             email: { required, email },
             password: { required },
@@ -72,7 +73,7 @@ export default {
         };
         const v$ = useVuelidate(rules, user);
 
-        return { user, logIn, failed, v$ };
+        return { user, logIn, failed, v$, error };
     },
 };
 </script>

@@ -1,6 +1,31 @@
 <template>
     <ModalApp :show="showModal">
-        {{ ModalValue }}
+        <div v-if="isEnd">
+            End game! result: WINNER:
+            {{
+                currentGame.result
+                    ? currentGame.host.firstName
+                    : currenctGame.guest.firstName
+            }}
+            <router-link
+                class="block w-full py-1 px-2 mt-5 bg-cgreen text-white"
+                v-if="isEnd"
+                :to="{ name: 'listGames' }"
+            >
+                <span>Back to lobby!</span>
+            </router-link>
+        </div>
+        <div v-else>
+            {{ ModalValue }}
+            <button
+                class="block w-full py-1 px-2 mt-5 bg-cgreen text-white"
+                v-if="!isFullLobby"
+                @click="copy(link)"
+            >
+                <span v-if="!copied">Copy</span>
+                <span v-else>Copied!</span>
+            </button>
+        </div>
     </ModalApp>
 
     <div class="dark:bg-dark min-h-screen dark:text-light">
@@ -8,6 +33,9 @@
             <h1 class="text-4xl font-bold dark:text-light text-light mb-6">
                 Game #{{ id }}
             </h1>
+            <div class="text-lg font-semibold text-center mb-12">
+                Score Limit:5
+            </div>
             <div>
                 <div
                     v-if="currentGame"
@@ -240,7 +268,6 @@
                         />
                     </label>
                 </div>
-                <GameHistory />
             </div>
         </div>
     </div>
@@ -259,15 +286,17 @@ import {
     reactive,
     toRefs,
 } from 'vue';
-import GameHistory from '../components/GameHistory.vue';
+
 import { HttpTransportType } from '@microsoft/signalr';
 import { useApi } from '@/composables/useApi';
 import { VueSignalR } from '@/modules/signalR/index';
 import app from '@/main.js';
 import { useGame } from '@/state/useGame';
 import { useAuth } from '@/state/useAuth';
+import { useClipboard } from '@vueuse/core';
+
 export default {
-    components: { ModalApp, GameHistory },
+    components: { ModalApp },
     name: 'game',
     setup() {
         const route = useRoute();
@@ -275,13 +304,15 @@ export default {
         const gameStore = useGame();
         const { user } = toRefs(useAuth());
         const { currentGame } = toRefs(gameStore);
-        const id = computed(() => currentGame.value.id || route.params.id);
+        const id = computed(() => route.params.id || currentGame.value.id);
         const JoinGameApi = useApi('Game/JoinGame/' + id.value);
         const MakeMoveApi = useApi('Game/MakeMove/' + id.value);
         const showModal = ref(true);
+        const link = ref(id.value);
+        const { text, copy, copied, isSupported } = useClipboard(link);
 
         app.use(VueSignalR, {
-            url: 'https://localhost:7182/',
+            url: 'http://rockpaperscissorscdv.azurewebsites.net/',
             options: {},
             provider: 'game?token=' + id.value,
             withUrlOptions: {
@@ -294,9 +325,9 @@ export default {
         const WsGame = inject('signalRGame');
         const type = ref('');
         const isJoin = computed(() => route.query.type === 'join');
-        const isHost = computed(
-            () => user.value.id === currentGame.value.hostId
-        );
+        const isHost = computed(() => {
+            return user.value.id === currentGame.value.hostId || false;
+        });
         onBeforeMount(() => {
             gameStore.setCurrentGameId(id.value);
         });
@@ -313,6 +344,7 @@ export default {
         }
         onMounted(() => {});
         WsGame.on('ReceiveGameUpdate', (data) => {
+            console.log('ReceiveGameUpdate');
             console.log(data);
             gameStore.setCurrentGame(data);
             checkShowModal();
@@ -327,8 +359,12 @@ export default {
             if (isHost.value) return currentGame.value.hostTurnFinished;
             else return currentGame.value.guestTurnFinished;
         });
+        const isEnd = computed(() => {
+            if (!currentGame) return false;
+            if (!currentGame.value.isActive) return true;
+            else return false;
+        });
         const checkShowModal = () => {
-            console.log('check show modal');
             if (!isFullLobby.value) showModal.value = true;
             else if (isFullLobby.value) showModal.value = false;
             else if (isSelected.value) showModal.value = true;
@@ -341,10 +377,16 @@ export default {
 
             if (type.value !== '') {
                 MakeMoveApi.post(enums.indexOf(type.value)).then(() => {
-                    console.log(MakeMoveApi.data.value);
                     type.value = '';
                 });
             }
+        });
+        watch(isSelected, () => {
+            console.log(isSelected.value, 'watch selected');
+            showModal.value = isSelected.value;
+        });
+        watch(isEnd, () => {
+            showModal.value = isEnd.value;
         });
         const nextTurn = computed(() => {
             return (
@@ -353,10 +395,10 @@ export default {
             );
         });
         const ModalValue = computed(() => {
+            if (isEnd.value) return;
             if (!isFullLobby.value) return 'Game start when oponent will join.';
             if (isSelected.value) return 'Wait for oponent choose';
-            // if (!currentGame.value.isActive)
-            //     return `End game! result: host ${currentGame.value.host}`;
+
             return '';
         });
         return {
@@ -371,6 +413,12 @@ export default {
             isHost,
             user,
             isSelected,
+            text,
+            copy,
+            copied,
+            isSupported,
+            link,
+            isEnd,
         };
     },
 };

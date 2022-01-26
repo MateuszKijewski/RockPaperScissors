@@ -103,14 +103,6 @@ export const useApi = (endpoint) => {
             return error.value.response.data.message.reduce((acc, msg) => {
                 let [field] = msg.split(' ');
 
-                // TODO: Maximal...
-
-                if (!acc[field]) {
-                    acc[field] = [];
-                }
-
-                acc[field].push(msg);
-
                 return acc;
             }, {});
         }

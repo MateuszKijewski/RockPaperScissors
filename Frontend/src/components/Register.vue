@@ -85,7 +85,7 @@ export default {
 
         const router = useRouter();
         const { post, data } = useApi('Auth/Register');
-        const success = ref(true);
+        const success = ref(false);
         const failed = ref(false);
 
         const logIn = () => {
