@@ -44,7 +44,7 @@ namespace RockPaperScissors.Mobile.ViewModels
                     FirstName = FirstName,
                     LastName = LastName,
                     Password = Password,
-                    Username = UserName
+                    Email = UserName
                 });
 
                 await Shell.Current.GoToAsync($"{nameof(LoginPage)}");

@@ -7,11 +7,12 @@
         <vm:GameHistoryViewModel/>
     </ContentPage.BindingContext>
     <ContentPage.Content>
-        <ListView>
+        <ListView ItemsSource="{Binding MyGames}">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <TextCell Text="{Binding Title}"
-                              Detail="{Binding Subtitle}" />
+                              Detail="{Binding Details}">
+                    </TextCell>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>

@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RockPaperScissors.Mobile.Views.GamePage"
+             xmlns:vm="clr-namespace:RockPaperScissors.Mobile.ViewModels">
+    <ContentPage.BindingContext>
+        <vm:GameViewModel/>
+    </ContentPage.BindingContext>
+    <ContentPage.Content>
+        <Grid RowDefinitions="Auto, Auto, Auto,*">
+            <StackLayout Grid.Row="1" HorizontalOptions="Center">
+                <Entry Text="{Binding Game.Id}" IsEnabled="False"></Entry>
+                <Label Text="Score limit" HorizontalOptions="Center"></Label>
+                <Label Text="{Binding Game.ScoreLimit}" HorizontalOptions="Center"></Label>
+            </StackLayout>
+            <StackLayout Grid.Row="2" Margin="10" Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
+                <StackLayout HorizontalOptions="Start">
+                    <Label Text="Player1"></Label>
+                    <Label Text="{Binding Game.Host.FirstName}"></Label>
+                </StackLayout>
+                <StackLayout HorizontalOptions="End">
+                    <Label Text="Player2"></Label>
+                    <Label Text="{Binding Game.Guest.FirstName}"></Label>
+                </StackLayout>
+            </StackLayout>
+            <StackLayout Grid.Row="3" HorizontalOptions="Center" Orientation="Horizontal" Spacing="15">
+                <StackLayout HorizontalOptions="Start">
+                    <Label Text="Player1 score"></Label>
+                    <Label Text="{Binding Game.HostScore}" HorizontalOptions="Center"></Label>
+                </StackLayout>
+                <StackLayout HorizontalOptions="End">
+                    <Label Text="Player2 score"></Label>
+                    <Label Text="{Binding Game.GuestScore}" HorizontalOptions="Center"></Label>
+                </StackLayout>
+            </StackLayout>
+            <StackLayout Grid.Row="4" HorizontalOptions="Center">
+                <StackLayout Orientation="Horizontal">
+                    <Button Text="ROCK" Command="{Binding MakeMoveWithRockCommand}"></Button>
+                    <Button Text="PAPER" Command="{Binding MakeMoveWithPaperCommand}"></Button>
+                    <Button Text="SCISSORS" Command="{Binding MakeMoveWithScissorsCommand}"></Button>
+                </StackLayout>
+            </StackLayout>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

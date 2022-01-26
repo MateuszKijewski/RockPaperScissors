@@ -100,5 +100,22 @@ namespace RockPaperScissors.WebApi.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet]
+        [Authorize]
+        [Route("api/[controller]/FetchGame/{gameId}")]
+        public async Task<ActionResult> FetchGame([FromRoute] string gameId)
+        {
+            try
+            {
+                var game = await _gameService.FetchGame(new Guid(gameId));
+
+                return Ok(game);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
