@@ -82,6 +82,7 @@
         <ShellContent Route="RegisterPage" ContentTemplate="{DataTemplate local:RegisterPage}" />
         <ShellContent Route="MainMenuPage" ContentTemplate="{DataTemplate local:MainMenuPage}" />
         <ShellContent Route="GameHistoryPage" ContentTemplate="{DataTemplate local:GameHistoryPage}" />
+        <ShellContent Route="GamePage" ContentTemplate="{DataTemplate local:GamePage}" />
     </FlyoutItem>
 
 </Shell>
