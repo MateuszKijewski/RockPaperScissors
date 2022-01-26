@@ -4,6 +4,8 @@ namespace RockPaperScissors.Application.Common.Interfaces
 {
     public interface IGameService
     {
+        public Task<Game> FetchGame(Guid gameId);
+
         public Task<Game> StartGame(int scoreLimit);
 
         public Task<Game> JoinGame(Guid gameId);

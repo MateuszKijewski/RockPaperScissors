@@ -13,5 +13,7 @@ namespace RockPaperScissors.Mobile.Common.Interfaces
         Task MakeMove(string gameId, GameFigure gameFigure);
 
         Task<IEnumerable<Game>> GetMyGames();
+
+        Task<Game> FetchGame(string gameId);
     }
 }

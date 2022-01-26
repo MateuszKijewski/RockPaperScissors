@@ -25,15 +25,23 @@ namespace RockPaperScissors.Application.Games.Services
 
         public async Task<Game> StartGame(int scoreLimit)
         {
-            var gameRepository = _baseRepositoryProvider.GetRepository<Game>();
-            var game = await gameRepository.AddAsync(new Game
+            Game game;
+            using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                HostScore = 0,
-                GuestScore = 0,
-                ScoreLimit = scoreLimit,
-                IsActive = true,
-                HostId = _currentUserService.Id
-            });
+                var gameRepository = _baseRepositoryProvider.GetRepository<Game>();
+                game = await gameRepository.AddAsync(new Game
+                {
+                    HostScore = 0,
+                    GuestScore = 0,
+                    ScoreLimit = scoreLimit,
+                    IsActive = true,
+                    HostId = _currentUserService.Id
+                });
+
+                game = await gameRepository.GetAsync(game.Id, nameof(Game.Host), nameof(Game.Guest));
+                transaction.Complete();
+            }
+            
 
             await _gameHub.Clients.Group(game.Id.ToString()).SendAsync("ReceiveGameUpdate", game);
             return game;
@@ -45,7 +53,7 @@ namespace RockPaperScissors.Application.Games.Services
             using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
                 var gameRepository = _baseRepositoryProvider.GetRepository<Game>();
-                game = gameRepository.GetAsync(gameId).GetAwaiter().GetResult();
+                game = gameRepository.GetAsync(gameId, nameof(Game.Host), nameof(Game.Guest)).GetAwaiter().GetResult();
 
                 if (game.GuestId != null)
                 {
@@ -146,9 +154,20 @@ namespace RockPaperScissors.Application.Games.Services
 
             var userId = _currentUserService.Id;
 
-            var games = await gameRepository.FindAsync(x => x.HostId == userId || x.GuestId == userId, nameof(Game.Guest), nameof(Game.Host));
+            var games = await gameRepository.FindAsync(
+                x => (x.HostId == userId || x.GuestId == userId)
+                && !x.IsActive
+                && x.Result.HasValue,
+                nameof(Game.Guest), nameof(Game.Host));
 
             return games;
+        }
+
+        public async Task<Game> FetchGame(Guid gameId)
+        {
+            var gameRepository = _baseRepositoryProvider.GetRepository<Game>();
+
+            return await gameRepository.GetAsync(gameId, nameof(Game.Host), nameof(Game.Guest));
         }
     }
 }

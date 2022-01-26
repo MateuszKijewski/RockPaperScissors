@@ -8,21 +8,49 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Xamarin.Forms;
 
 namespace RockPaperScissors.Mobile.Services
 {
     public class GameService : IGameService
     {
         private readonly JsonSerializerSettings _serializerSettings;
+        private readonly ISettingsService _settingsService;
 
         public GameService()
         {
+            _settingsService = DependencyService.Get<ISettingsService>();
             _serializerSettings = new JsonSerializerSettings
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver(),
                 NullValueHandling = NullValueHandling.Ignore
             };
             _serializerSettings.Converters.Add(new StringEnumConverter());
+        }
+
+        public async Task<Game> FetchGame(string gameId)
+        {
+            try
+            {
+                var client = CreateHttpClient();
+
+                var xd = $"{GlobalSettings.Instance.DefaultGameEndpoint}/FetchGame/{gameId}";
+
+                var response = await client.GetAsync(xd);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var stringResponse = await response.Content.ReadAsStringAsync();
+
+                    return JsonConvert.DeserializeObject<Game>(stringResponse);
+                }
+                throw new Exception("Fetching game failed");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("XDDDDDD");
+            }
+            return new Game();
         }
 
         public async Task<IEnumerable<Game>> GetMyGames()
@@ -60,7 +88,7 @@ namespace RockPaperScissors.Mobile.Services
         public async Task MakeMove(string gameId, GameFigure gameFigure)
         {
             var client = CreateHttpClient();
-            var content = new StringContent(gameFigure.ToString());
+            var content = new StringContent(((int)gameFigure).ToString());
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
             var response = await client.PostAsync($"{GlobalSettings.Instance.DefaultGameEndpoint}/MakeMove/{gameId}", content);
@@ -91,9 +119,12 @@ namespace RockPaperScissors.Mobile.Services
         private HttpClient CreateHttpClient()
         {
             HttpClientHandler clientHandler = new HttpClientHandler();
+
             clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
 
             var httpClient = new HttpClient(clientHandler);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _settingsService.AccessToken);
+
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             return httpClient;
         }

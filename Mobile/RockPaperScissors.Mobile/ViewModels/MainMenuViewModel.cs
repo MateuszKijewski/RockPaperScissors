@@ -9,8 +9,12 @@ namespace RockPaperScissors.Mobile.ViewModels
 {
     public class MainMenuViewModel : BaseViewModel
     {
+        private readonly IGameService _gameService;
+
         public MainMenuViewModel()
         {
+            _gameService = DependencyService.Get<IGameService>();
+
             JoinGameCommand = new AsyncCommand(JoinGame);
             NewGameCommand = new AsyncCommand(NewGame);
             ShowGameHistoryCommand = new AsyncCommand(ShowGameHistory);
@@ -22,20 +26,22 @@ namespace RockPaperScissors.Mobile.ViewModels
 
         private async Task JoinGame()
         {
-
+            await _gameService.JoinGame(_gameId);
+            await Shell.Current.GoToAsync($"{nameof(GamePage)}?gameId={_gameId}");
         }
 
         private async Task NewGame()
         {
-
+            var game = await _gameService.StartGame(_scoreLimit);
+            await Shell.Current.GoToAsync($"{nameof(GamePage)}?gameId={game.Id}");
         }
         private async Task ShowGameHistory()
         {
-            await Shell.Current.GoToAsync($"//{nameof(GameHistoryPage)}");
+            await Shell.Current.GoToAsync($"{nameof(GameHistoryPage)}");
         }
 
-        private string _scoreLimit;
-        public string ScoreLimit
+        private int _scoreLimit;
+        public int ScoreLimit
         {
             get => _scoreLimit;
             set
