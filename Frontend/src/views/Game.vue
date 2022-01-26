@@ -312,7 +312,7 @@ export default {
         const { text, copy, copied, isSupported } = useClipboard(link);
 
         app.use(VueSignalR, {
-            url: 'http://rockpaperscissorscdv.azurewebsites.net/',
+            url: 'rockpaperscissorscdv.azurewebsites.net/',
             options: {},
             provider: 'game?token=' + id.value,
             withUrlOptions: {
